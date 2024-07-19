@@ -1,19 +1,9 @@
 // Example 3: Preserves context to maintain state.
-const prompt = require('prompt-sync')();
 const AssistantV2 = require('ibm-watson/assistant/v2');
 const { IamAuthenticator } = require('ibm-watson/auth');
 require('dotenv').config();
 
-
-const bodyParser = require('body-parser');
-const cors = require("cors");
-const express = require('express');
-const app = express();
-const port = 3000;
-app.use(cors());
-app.use(bodyParser.json());
-
-
+console.log(process.env.ASSISTANT_IAM_API_KEY)
 // Create Assistant service object.
 const assistant = new AssistantV2({
   version: process.env.VERSION,
@@ -23,52 +13,67 @@ const assistant = new AssistantV2({
   url: process.env.ASSISTANT_IAM_URL, // replace with URL
 });
 
-const assistantId = process.env.WORKSPACE_ID_IMC; // replace with environment ID
-
+let redirect; 
+let assistantId;
 // Start conversation with empty message
 let context = {};
 
 
 
 // Send message to assistant.
-function sendMessage(userInput) {
-  console.log("OIOIOIOI")
+async function sendMessage(userInput) {
+
+  assistantId = setAssistantID(redirect)
   messageInput = {
     messageType: 'text',
     text: userInput,
   };
-
-  assistant
+  
+  let agentMessage = await assistant
     .messageStateless({
       assistantId,
       input: messageInput,
       context: context,
     })
-    .then(res => {
-      console.log(res)
-      processResult(res.result);
-    })
-    .catch(err => {
-      console.log(err); // something went wrong
-    });
+    if(agentMessage.result.context.skills["actions skill"].skill_variables.redirect){
+      redirect = agentMessage.result.context.skills["actions skill"].skill_variables.redirect
+      console.log('✌️ redirect --->', redirect);
+    }
+    
+    let result = await processResult(agentMessage.result);
+    return {
+      text: result,
+      redirect: agentMessage    
+    }
 }
 
 
 // Process the result.
-function processResult(result) {
-
+async function processResult(result) {
   context = result.context;
 
   // Print responses from actions, if any. Supports only text responses.
   if (result.output.generic) {
-    if (result.output.generic.length > 0) {
-      result.output.generic.forEach( response => {
-        if (response.response_type === 'text') {
-          console.log(response.text);
-        }  
-      });
+    for (const response of result.output.generic) {
+      if (response.response_type === 'text') {
+        console.log(">>> " + response.text);
+        return response.text;
+      }
     }
   }
 }
+
+function setAssistantID(redirect){
+  if(redirect == "imc"){
+    return process.env.WORKSPACE_ID_IMC
+  }
+  else if(redirect == "credito"){
+    return WORKSPACE_ID_CREDITO
+  }
+  else{
+    return process.env.ASSISTANT_ID_ROOT
+  }
+}
+
 
 module.exports = sendMessage;

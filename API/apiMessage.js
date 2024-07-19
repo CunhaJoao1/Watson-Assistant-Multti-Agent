@@ -1,6 +1,4 @@
 // Example 3: Preserves context to maintain state.
-
-const prompt = require('prompt-sync')();
 const AssistantV2 = require('ibm-watson/assistant/v2');
 const { IamAuthenticator } = require('ibm-watson/auth');
 require('dotenv').config();
@@ -29,7 +27,11 @@ const assistantId = process.env.WORKSPACE_ID_IMC; // replace with environment ID
 // Start conversation with empty message
 let context = {};
 
+app.get("/", (req,res)=>{
 
+  res.send("ola mundo")
+
+})
 app.post("/send-message", async (req, res)=>{
     messageInput = {
       messageType: 'text',
@@ -38,6 +40,7 @@ app.post("/send-message", async (req, res)=>{
     console.log("User message: " + messageInput.text)
     let assistantMessage = sendMessage(messageInput, context);
     res.json(assistantMessage);
+    res.send(assistantMessage)
 })
 
 // Send message to assistant.

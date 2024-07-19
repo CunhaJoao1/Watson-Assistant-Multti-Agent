@@ -12,12 +12,21 @@ app.use(bodyParser.json());
 app.get("/" , (req,res)=>{
     res.json(req)
 })
-app.post("/teste", (req,res)=>{
+let redirect;
+
+app.post("/teste",async (req,res)=>{
 
     let {message} = req.body
-    let teste = sendMessage(message)
-
-    res.json(teste);
+    messageInput = {
+        messageType: 'text',
+        text: message,
+      };
+    
+    console.log("user input>>> " + message)
+    let agentMessage = await sendMessage(message)
+    // redirect = agentMessage.result.context.skills["actions skill"].skill_variables.redirect
+    // console.log({agentMessage})
+    res.send({response: agentMessage});
 
 })
 

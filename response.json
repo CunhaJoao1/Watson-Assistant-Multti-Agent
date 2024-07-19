@@ -1,0 +1,42 @@
+{
+    "output": {
+      "intents": [
+        {
+          "intent": "action_40624_intent_30559",
+          "confidence": 1
+        }
+      ],
+      "entities": [],
+      "generic": []
+    },
+    "user_id": "0acad316-db66-4684-8562-6ec33280ec5b",
+    "context": {
+      "global": {
+        "system": {
+          "session_start_time": "2024-07-16T20:02:39.257Z",
+          "turn_count": 1,
+          "user_id": "0acad316-db66-4684-8562-6ec33280ec5b",
+          "state": "teste"
+        },
+        "session_id": "0acad316-db66-4684-8562-6ec33280ec5b"
+      },
+      "skills": {
+        "conversational_skills": {
+          "stack": [],
+          "session_variables": {}
+        },
+        "actions skill": {
+          "action_variables": {},
+          "skill_variables": {
+            "redirect": "imc"
+          },
+          "private_action_variables": {},
+          "private_skill_variables": {},
+          "system": {
+            "state": "teste="
+          }
+        }
+      }
+    }
+  }
+  

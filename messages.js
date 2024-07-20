@@ -24,7 +24,7 @@ let context = {};
 async function sendMessage(userInput) {
 
   assistantId = setAssistantID(redirect)
-  messageInput = {
+  let messageInput = {
     messageType: 'text',
     text: userInput,
   };
@@ -35,11 +35,19 @@ async function sendMessage(userInput) {
       input: messageInput,
       context: context,
     })
+    // console.log(agentMessage)
     if(agentMessage.result.context.skills["actions skill"].skill_variables.redirect){
       redirect = agentMessage.result.context.skills["actions skill"].skill_variables.redirect
       console.log('✌️ redirect --->', redirect);
+      assistantId = setAssistantID(redirect)
+
+      agentMessage = await assistant.messageStateless({
+        assistantId,
+        input: messageInput,
+        context: context,
+      })
     }
-    
+
     let result = await processResult(agentMessage.result);
     return {
       text: result,
@@ -50,10 +58,12 @@ async function sendMessage(userInput) {
 
 // Process the result.
 async function processResult(result) {
-  context = result.context;
 
+  context = result.context;
+  // console.log(JSON.stringify(result,null,2))
   // Print responses from actions, if any. Supports only text responses.
   if (result.output.generic) {
+   
     for (const response of result.output.generic) {
       if (response.response_type === 'text') {
         console.log(">>> " + response.text);
@@ -65,12 +75,15 @@ async function processResult(result) {
 
 function setAssistantID(redirect){
   if(redirect == "imc"){
+    console.log("===IMC===")
     return process.env.WORKSPACE_ID_IMC
   }
   else if(redirect == "credito"){
-    return WORKSPACE_ID_CREDITO
+    console.log("===cretito===")
+    return process.env.WORKSPACE_ID_CREDITO
   }
   else{
+    console.log("===agent===")
     return process.env.ASSISTANT_ID_ROOT
   }
 }

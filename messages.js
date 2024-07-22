@@ -24,6 +24,7 @@ let context = {};
 async function sendMessage(userInput) {
 
   assistantId = setAssistantID(redirect)
+  console.log('✌️assistantId --->', assistantId);
   let messageInput = {
     messageType: 'text',
     text: userInput,
@@ -33,19 +34,22 @@ async function sendMessage(userInput) {
     .messageStateless({
       assistantId,
       input: messageInput,
-      context: context,
+      context,
     })
     // console.log(agentMessage)
+
     if(agentMessage.result.context.skills["actions skill"].skill_variables.redirect){
       redirect = agentMessage.result.context.skills["actions skill"].skill_variables.redirect
-      console.log('✌️ redirect --->', redirect);
       assistantId = setAssistantID(redirect)
 
+      redirect == "agent"? messageInput.text = "oi": null
+      context = {}
       agentMessage = await assistant.messageStateless({
         assistantId,
         input: messageInput,
-        context: context,
+        context,
       })
+      
     }
 
     let result = await processResult(agentMessage.result);
